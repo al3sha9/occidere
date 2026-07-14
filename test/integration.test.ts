@@ -71,7 +71,7 @@ test("complete CLI workflow against a disposable server", async () => {
 
     const killed = runCli("kill", String(port), "--force");
     assert.equal(killed.status, 0, killed.stderr);
-    assert.match(killed.stdout, /Stopped bun/);
+    assert.match(killed.stdout, /stopped bun(?:\.exe)?/i);
     assert.equal(runCli("info", String(port)).status, 3);
   } finally { stopChild(child); }
 });
