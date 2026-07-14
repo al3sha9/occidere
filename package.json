@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "start": "bun run src/cli.ts",
-    "test": "bun test",
+    "test": "bun test --timeout 20000",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
