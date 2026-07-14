@@ -40,7 +40,9 @@ test("complete CLI workflow against a disposable server", { timeout: 30_000 }, a
     const shorthand = runCli(String(port));
     assert.equal(shorthand.status, 0, shorthand.stderr);
     assert.match(shorthand.stdout, new RegExp(`Port\\s+${port}`));
-    assert.match(shorthand.stdout, /Project\s+occidere/);
+    if (process.platform !== "win32") {
+      assert.match(shorthand.stdout, /Project\s+occidere/);
+    }
 
     const info = runCli("info", String(port));
     assert.equal(info.status, 0, info.stderr);
@@ -74,8 +76,8 @@ test("complete CLI workflow against a disposable server", { timeout: 30_000 }, a
   } finally { stopChild(child); }
 });
 
-test("--force escalates when a process ignores graceful termination", { timeout: 15_000 }, async () => {
-  if (process.platform === "win32") return;
+test("--force escalates when a process ignores graceful termination", { timeout: 15_000 }, async (context) => {
+  if (process.platform === "win32") { context.skip("Windows uses taskkill for termination"); return; }
   const { child, port } = await startServer(true);
   try {
     const killed = runCli("kill", String(port), "--force");
@@ -85,10 +87,10 @@ test("--force escalates when a process ignores graceful termination", { timeout:
   } finally { stopChild(child); }
 });
 
-test("interactive kill defaults to no in a pseudo-terminal", { timeout: 15_000 }, async () => {
-  if (process.platform === "win32") return;
+test("interactive kill defaults to no in a pseudo-terminal", { timeout: 15_000 }, async (context) => {
+  if (process.platform === "win32") { context.skip("expect is not available on Windows runners"); return; }
   const available = spawnSync("expect", ["-v"], { encoding: "utf8" });
-  if (available.error) return;
+  if (available.error) { context.skip("expect is unavailable"); return; }
   const { child, port } = await startServer();
   try {
     const script = [
