@@ -34,7 +34,7 @@ function stopChild(child: ChildProcessWithoutNullStreams): void {
   if (child.exitCode === null) child.kill("SIGKILL");
 }
 
-test("complete CLI workflow against a disposable server", { timeout: 30_000 }, async () => {
+test("complete CLI workflow against a disposable server", async () => {
   const { child, port } = await startServer();
   try {
     const shorthand = runCli(String(port));
@@ -78,7 +78,7 @@ test("complete CLI workflow against a disposable server", { timeout: 30_000 }, a
 
 const unixTest = process.platform === "win32" ? test.skip : test;
 
-unixTest("--force escalates when a process ignores graceful termination", { timeout: 15_000 }, async () => {
+unixTest("--force escalates when a process ignores graceful termination", async () => {
   const { child, port } = await startServer(true);
   try {
     const killed = runCli("kill", String(port), "--force");
@@ -92,7 +92,7 @@ const expectAvailable = process.platform !== "win32"
   && !spawnSync("expect", ["-v"], { encoding: "utf8" }).error;
 const terminalTest = expectAvailable ? test : test.skip;
 
-terminalTest("interactive kill defaults to no in a pseudo-terminal", { timeout: 15_000 }, async () => {
+terminalTest("interactive kill defaults to no in a pseudo-terminal", async () => {
   const { child, port } = await startServer();
   try {
     const script = [

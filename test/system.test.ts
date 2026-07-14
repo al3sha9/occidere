@@ -36,7 +36,7 @@ test("detects an HTTP local service", async () => {
   finally { server.stop(true); }
 });
 
-test("detects an HTTPS local service", { timeout: 15_000 }, async () => {
+test("detects an HTTPS local service", async () => {
   const available = spawnSync("openssl", ["version"], { encoding: "utf8" });
   if (available.error) return;
   const directory = await mkdtemp(join(tmpdir(), "occidere-tls-"));
