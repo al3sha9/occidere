@@ -4,11 +4,28 @@
   "description": "Understand and manage services running on local ports.",
   "type": "module",
   "bin": {
-    "occidere": "./src/cli.ts"
+    "occidere": "bin/occidere.js"
   },
   "files": [
+    "bin",
     "src",
     "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/al3sha9/occidere.git"
+  },
+  "homepage": "https://github.com/al3sha9/occidere#readme",
+  "bugs": {
+    "url": "https://github.com/al3sha9/occidere/issues"
+  },
+  "author": "Ali Shan <optimist.alishan@gmail.com>",
+  "keywords": [
+    "cli",
+    "port",
+    "process",
+    "localhost",
+    "developer-tools"
   ],
   "scripts": {
     "start": "bun run src/cli.ts",
@@ -17,6 +34,9 @@
   },
   "engines": {
     "bun": ">=1.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT",
   "devDependencies": {
