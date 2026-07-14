@@ -1,4 +1,4 @@
-import test from "node:test";
+import { test } from "bun:test";
 import assert from "node:assert/strict";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -36,9 +36,9 @@ test("detects an HTTP local service", async () => {
   finally { server.stop(true); }
 });
 
-test("detects an HTTPS local service", async (context) => {
+test("detects an HTTPS local service", { timeout: 15_000 }, async () => {
   const available = spawnSync("openssl", ["version"], { encoding: "utf8" });
-  if (available.error) { context.skip("openssl is unavailable"); return; }
+  if (available.error) return;
   const directory = await mkdtemp(join(tmpdir(), "occidere-tls-"));
   const key = join(directory, "key.pem");
   const cert = join(directory, "cert.pem");

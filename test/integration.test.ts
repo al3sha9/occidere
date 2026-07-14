@@ -1,4 +1,4 @@
-import test from "node:test";
+import { test } from "bun:test";
 import assert from "node:assert/strict";
 import { chmod, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -76,8 +76,9 @@ test("complete CLI workflow against a disposable server", { timeout: 30_000 }, a
   } finally { stopChild(child); }
 });
 
-test("--force escalates when a process ignores graceful termination", { timeout: 15_000 }, async (context) => {
-  if (process.platform === "win32") { context.skip("Windows uses taskkill for termination"); return; }
+const unixTest = process.platform === "win32" ? test.skip : test;
+
+unixTest("--force escalates when a process ignores graceful termination", { timeout: 15_000 }, async () => {
   const { child, port } = await startServer(true);
   try {
     const killed = runCli("kill", String(port), "--force");
@@ -87,10 +88,11 @@ test("--force escalates when a process ignores graceful termination", { timeout:
   } finally { stopChild(child); }
 });
 
-test("interactive kill defaults to no in a pseudo-terminal", { timeout: 15_000 }, async (context) => {
-  if (process.platform === "win32") { context.skip("expect is not available on Windows runners"); return; }
-  const available = spawnSync("expect", ["-v"], { encoding: "utf8" });
-  if (available.error) { context.skip("expect is unavailable"); return; }
+const expectAvailable = process.platform !== "win32"
+  && !spawnSync("expect", ["-v"], { encoding: "utf8" }).error;
+const terminalTest = expectAvailable ? test : test.skip;
+
+terminalTest("interactive kill defaults to no in a pseudo-terminal", { timeout: 15_000 }, async () => {
   const { child, port } = await startServer();
   try {
     const script = [

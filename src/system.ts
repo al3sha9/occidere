@@ -158,8 +158,15 @@ async function waitForExit(pid: number, timeoutMs = 1500): Promise<boolean> {
 }
 
 export async function killProcess(pid: number, force = false): Promise<{ forced: boolean }> {
-  if (process.platform === "win32") await run("taskkill", ["/PID", String(pid), "/T"]);
-  else process.kill(pid, "SIGTERM");
+  if (process.platform === "win32") {
+    try { await run("taskkill", ["/PID", String(pid), "/T"]); }
+    catch (error) {
+      if (!force) throw error;
+      await run("taskkill", ["/PID", String(pid), "/T", "/F"]);
+      if (!await waitForExit(pid)) throw new Error(`Process ${pid} could not be stopped.`);
+      return { forced: true };
+    }
+  } else process.kill(pid, "SIGTERM");
   if (await waitForExit(pid)) return { forced: false };
   if (!force) throw new Error(`Process ${pid} did not exit after SIGTERM. Retry with --force.`);
   if (process.platform === "win32") await run("taskkill", ["/PID", String(pid), "/T", "/F"]);
